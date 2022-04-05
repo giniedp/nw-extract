@@ -1,0 +1,56 @@
+{
+  "name": "nw-extract",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "extract": "ts-node ./src/extract.ts",
+    "extract:live": "yarn extract -i \"G:\\Steam\\steamapps\\common\\New World\" -o ./out/live -f \"datasheet:json,locale:json,icon:png,image:png\"",
+    "extract:ptr": "yarn extract -i \"G:\\Steam\\steamapps\\common\\New World Public Test Realm\" -o ./out/ptr -f \"datasheet:json,locale:json,icon:png\"",
+    "convert": "./texconv.exe -r:keep -o tmp -ft png out/live/*.dds"
+  },
+  "keywords": [],
+  "author": "Jasper Catthoor",
+  "license": "ISC",
+  "dependencies": {
+    "@types/tmp": "^0.2.3",
+    "jsdom": "^19.0.0",
+    "tmp": "^0.2.1",
+    "xmldom": "^0.6.0"
+  },
+  "exports": "./index.js",
+  "engines": {
+    "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
+  },
+  "bin": {
+    "nw-extract": "./dist/extract.js",
+    "nw-convert": "./dist/convert.js"
+  },
+  "files": [
+    "fist",
+    "package.json",
+    "README.md"
+  ],
+  "devDependencies": {
+    "@types/cli-progress": "^3.9.2",
+    "@types/jsdom": "^16.2.14",
+    "@types/lodash": "^4.14.178",
+    "@types/papaparse": "^5.3.1",
+    "@types/xmldom": "^0.1.31",
+    "@types/yauzl": "^2.9.2",
+    "autoprefixer": "^10.4.2",
+    "cli-progress": "^3.10.0",
+    "commander": "^8.3.0",
+    "fast-glob": "^3.2.10",
+    "ffi-napi": "^4.0.3",
+    "lodash": "^4.17.21",
+    "papaparse": "^5.3.1",
+    "postcss": "^8.4.8",
+    "tailwindcss": "^3.0.23",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.4",
+    "workerpool": "^6.1.5",
+    "yauzl": "https://github.com/Kattoor/yauzl.git"
+  }
+}
