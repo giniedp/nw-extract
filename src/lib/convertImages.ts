@@ -1,18 +1,8 @@
 import { promises as fs } from "fs";
 import * as path from "path";
-import { globFiles } from "./globFiles";
 import * as tmp from 'tmp'
 import { spawn } from "./spawn";
 import { mkdir } from "./copy";
-
-export async function convertImages(srcDir: string, format: string | string[], options?: { unlink: boolean }) {
-  const glob = path.join(srcDir, '**', "*.dds")
-  const files = await globFiles(glob);
-
-  for (const file of files) {
-    
-  }
-}
 
 export async function convertImage(data: Buffer, format: string, options: {
   texconv: string,

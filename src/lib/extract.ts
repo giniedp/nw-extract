@@ -1,8 +1,8 @@
 import { promises as fs } from 'fs'
 import * as path from 'path'
-import { isDatasheet, isIcon, isImage, isImageFile, isLocale, isTexture, listFiles } from './listFiles'
+import { isDatasheet, isIcon, isImage, isImageFile, isLocale, isScript, isTexture, listFiles } from './listFiles'
 import { decompress, DecompressEntry } from './decompress'
-import { globFiles } from './globFiles'
+import { listPakFiles } from './globFiles'
 import { Entry } from 'yauzl'
 import { convertDatasheet } from './convertDatasheets'
 import { parseDatasheet } from './readDatasheet'
@@ -10,7 +10,7 @@ import { convertLocale } from './convertLocale'
 import { convertImage } from './convertImages'
 import { pathIsFile } from './copy'
 
-export type AssetType = 'datasheet' | 'locale' | 'texture' | 'icon' | 'image'
+export type AssetType = 'datasheet' | 'locale' | 'texture' | 'icon' | 'image' | 'script'
 export type AssetFormat = 'csv' | 'json' | 'xml' | 'png' | 'jpg'
 export type AssetFilter = `${AssetType}:${AssetFormat}`
 
@@ -37,9 +37,11 @@ interface AssetConversion {
 }
 
 export async function extract({ inputDir, outputDir, filter, onProgress, update }: ExtractOptions) {
+  const stat = await fs.stat(inputDir)
   const conversion = parseFilter(filter)
   const glob = path.join(inputDir, '**', '*.pak')
-  const pakFiles = await globFiles(glob)
+  // const pakFiles = await globFiles(glob)
+  const pakFiles = await listPakFiles(inputDir)
   const entryFilter = createFilter(conversion)
   const entryConverter = createConverter(conversion)
   const groups = pakFiles.map((file) => {
@@ -124,6 +126,9 @@ function createFilter(conversion: AssetConversion[]) {
       return true
     }
     if (filter.includes('image') && isImage(entry.fileName)) {
+      return true
+    }
+    if (filter.includes('script') && isScript(entry.fileName)) {
       return true
     }
     return false

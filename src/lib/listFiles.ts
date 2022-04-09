@@ -13,6 +13,10 @@ export function isLocale(file: string) {
   return file.endsWith('.loc.xml')
 }
 
+export function isScript(file: string) {
+  return file.endsWith('.lua')
+}
+
 export function isImageFile(file: string) {
   return file.endsWith(".dds") || file.endsWith(".png") // || file.includes(".dds.")
 }
