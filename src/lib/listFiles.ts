@@ -14,7 +14,7 @@ export function isLocale(file: string) {
 }
 
 export function isScript(file: string) {
-  return file.endsWith('.lua')
+  return file.endsWith('.luac')
 }
 
 export function isImageFile(file: string) {
