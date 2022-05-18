@@ -1,20 +1,15 @@
-import { promises as fs } from "fs";
-import * as path from "path";
-import * as tmp from 'tmp'
-import { spawn } from "./spawn";
-import { mkdir } from "./copy";
+import { promises as fs } from "fs"
+import * as path from "path"
+import { spawn } from "./spawn"
+import { mkdir } from "./copy"
 
 export async function convertImage(data: Buffer, format: string, options: {
   texconv: string,
   tmpdir: string
 }) {
-  const tmpDir = options.tmpdir || path.join(process.cwd(), 'tmp')
-  const ddsDir = path.join(tmpDir, 'nw-extract-dds')
-  // const ddsFile = await tmpFile({
-  //   dir: tmpDir,
-  //   postfix: '.dds'
-  // }) 
-  const ddsFile = path.join(ddsDir, 'image.dds')
+  const tmpDir = options.tmpdir || process.cwd()
+  const ddsDir = path.join(tmpDir, '.nw-convert')
+  const ddsFile = path.join(tmpDir, 'image.dds')
   const texconv = options.texconv || 'texconv.exe'
   const resultFile = path.join(ddsDir, path.basename(ddsFile, '.dds') + `.${format}`) 
 
@@ -32,16 +27,4 @@ export async function convertImage(data: Buffer, format: string, options: {
   await fs.unlink(resultFile).catch(console.error)
 
   return result
-}
-
-function tmpFile(options: tmp.TmpNameOptions) {
-  return new Promise<string>((resolve, reject) => {
-    tmp.tmpName(options, (err, file) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(file)
-      }
-    })
-  })
 }

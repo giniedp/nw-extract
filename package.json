@@ -6,13 +6,13 @@
     "build": "tsc",
     "watch": "tsc -w",
     "extract": "ts-node ./src/extract.ts",
-    "extract:live": "yarn extract -i \"C:\\Program Files (x86)\\Steam\\steamapps\\common\\New World\" -o ./out/live -f \"datasheet:json,locale:json,icon:png,image:png,script\"",
-    "extract:ptr": "yarn extract -i \"G:\\Steam\\steamapps\\common\\New World Public Test Realm\" -o ./out/ptr -f \"datasheet:json,locale:json,icon:png\"",
+    "extract:live": "yarn extract \"C:\\Program Files (x86)\\Steam\\steamapps\\common\\New World\" ./out/live -f \"datasheet:json,locale:json,icon:png,image:png,script\"",
+    "extract:ptr": "yarn extract \"G:\\Steam\\steamapps\\common\\New World Public Test Realm\" ./out/ptr -f \"datasheet:json,locale:json,icon:png,image:png\"",
     "convert": "./texconv.exe -r:keep -o tmp -ft png out/live/*.dds"
   },
   "keywords": [],
-  "author": "Jasper Catthoor",
-  "license": "ISC",
+  "author": "Alexander Gräfenstein",
+  "license": "MIT",
   "dependencies": {
     "@types/tmp": "^0.2.3",
     "jsdom": "^19.0.0",
@@ -24,11 +24,10 @@
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
   },
   "bin": {
-    "nw-extract": "./dist/extract.js",
-    "nw-convert": "./dist/convert.js"
+    "nw-extract": "./dist/extract.js"
   },
   "files": [
-    "fist",
+    "dist",
     "package.json",
     "README.md"
   ],
