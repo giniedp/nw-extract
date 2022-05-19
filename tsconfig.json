@@ -4,8 +4,10 @@
     "rootDir": "./src",
     "baseUrl": "./src",
     "moduleResolution": "node",
+    "importHelpers": true,
     "module": "CommonJS",
     "target": "ES5",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "declaration": true
   }
 }

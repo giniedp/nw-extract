@@ -15,7 +15,7 @@ Library and tool to extract assets from New World game folder
 Install globally
 
 ```sh
-npm install giniedp/nw-extract#main -g
+npm install nw-extract
 ```
 
 Then to extract data from game intall dir
@@ -47,7 +47,7 @@ Examples:
 Add dependency to your project
 
 ```sh
-npm install giniedp/nw-extract#main -D
+npm install nw-extract -D
 ```
 
 ES6 import
