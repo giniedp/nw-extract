@@ -14,10 +14,10 @@ interface Options {
 
 program
   .argument('<input-dir>', 'New World game folder')
-  .option('-o,--output', 'Output folder', './nw-extract-output')
+  .option('-o,--output <path>', 'Output folder', './nw-extract-output')
   .option('-u,--update', 'Skips cache mechanisms for subsequential runs.', false)
   .option('-f,--filter <type>', 'Asset filter and conversion flags.')
-  .option('--lib <path>', 'path to directory where oo2core_8_win64.dll is located', '')
+  .option('--lib <path>', 'path to directory where oo2core_8_win64.dll is located')
   .addHelpText('afterAll', `
 Example:
   nw-extract \"C:\\Program Files (x86)\\Steam\\steamapps\\common\\New World\"  
