@@ -10,7 +10,8 @@ export interface DecompressEntry {
 }
 
 const LIB_NAME = 'oo2core_8_win64.dll'
-export function decompressLibrary(libDir: string = LIB_NAME): { OodleLZ_Decompress: Function } {
+export function decompressLibrary(libDir?: string): { OodleLZ_Decompress: Function } {
+  libDir = libDir || LIB_NAME
   if (libDir && !libDir.match(/\.dll$/i)) {
     libDir = path.join(libDir, LIB_NAME)
   }
