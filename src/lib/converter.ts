@@ -1,12 +1,11 @@
 import * as path from 'path'
-import { isDatasheet, isIcon, isImage, isImageFile, isLocale, isScript, isTexture, isXML } from './listFiles'
-import { DecompressEntry } from './decompress'
+import { globMatch, isDatasheet, isIcon, isImage, isImageFile, isLocale, isScript, isTexture, isXML } from './listFiles'
 import { Entry } from 'yauzl'
 import { convertDatasheet } from './convertDatasheets'
 import { parseDatasheet } from './readDatasheet'
 import { convertLocale } from './convertLocale'
 import { convertImage } from './convertImages'
-import type { Converter, ConverterFactory } from './extract'
+import type { Converter, ConverterFactory } from './actions'
 
 export type AssetType = '*' | 'datasheet' | 'locale' | 'texture' | 'icon' | 'image' | 'script' | 'xml'
 export type AssetFormat = 'csv' | 'json' | 'xml' | 'png' | 'jpg'
@@ -32,7 +31,12 @@ function parseFilter(filter: Array<AssetFilter>): Array<AssetConversion> {
 export function createFilter(filterInput: AssetFilter[]) {
   const conversion = parseFilter(filterInput)
   const filter = conversion.map((it) => it.type)
+  const exclude = filter.filter((it) => it.startsWith('!')).map((it) => it.substring(1))
+
   return (entry: Entry) => {
+    if (exclude.length && globMatch([entry.fileName], exclude).length) {
+      return false
+    }
     if (!filter?.length || filter.includes('*')) {
       return true
     }
@@ -63,8 +67,8 @@ export function createFilter(filterInput: AssetFilter[]) {
 
 export function createConverter(filterInput: AssetFilter[]): ConverterFactory {
   const conversion = parseFilter(filterInput)
-  return (entry: DecompressEntry, data: Buffer): Converter => {
-    if (isDatasheet(entry.file)) {
+  return (file: string, data: Buffer): Converter => {
+    if (isDatasheet(file)) {
       const format = conversion.find((it) => it.type === 'datasheet')?.target
       if (format === 'json' || format === 'csv') {
         return {
@@ -73,7 +77,7 @@ export function createConverter(filterInput: AssetFilter[]): ConverterFactory {
         }
       }
     }
-    if (isLocale(entry.file)) {
+    if (isLocale(file)) {
       const format = conversion.find((it) => it.type === 'locale')?.target
       if (format === 'json' || format === 'csv') {
         return {
@@ -82,24 +86,22 @@ export function createConverter(filterInput: AssetFilter[]): ConverterFactory {
         }
       }
     }
-    if (isImageFile(entry.file) && path.extname(entry.file) === '.dds') {
+    if (isImageFile(file) && path.extname(file) === '.dds') {
       const format = conversion.find((it) => {
         return (
-          (isIcon(entry.file) && it.type === 'icon') ||
-          (isTexture(entry.file) && it.type === 'texture') ||
-          (isImage(entry.file) && it.type === 'image')
+          (isIcon(file) && it.type === 'icon') ||
+          (isTexture(file) && it.type === 'texture') ||
+          (isImage(file) && it.type === 'image')
         )
       })?.target
       if (format === 'png' || format === 'jpg') {
         return {
           format: format,
           data: async () =>
-          Buffer.from(
             await convertImage(data, format, {
               texconv: path.join(process.cwd(), 'texconv.exe'),
               tmpdir: path.join(process.cwd(), 'tmp'),
             }),
-          )
         }
       }
     }

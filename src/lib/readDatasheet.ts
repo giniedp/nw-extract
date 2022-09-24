@@ -53,15 +53,16 @@ export async function parseDatasheet(data: Buffer): Promise<Datasheet> {
 }
 
 function readString(data: Buffer, offset: number) {
-  let length = 0;
+  let length = -1;
   let next: number;
   do {
-    next = data.readInt8(offset + length++);
-  } while (next !== 0);
-  if (length === 1) {
+    length += 1  
+    next = data.readInt8(offset + length);
+  } while (next !== 0 && ((offset + length) < data.byteLength));
+  if (length <= 0) {
     return null;
   }
-  return data.slice(offset, offset + length - 1).toString();
+  return data.slice(offset, offset + length).toString();
 }
 
 function readCell(data: Buffer, offset: number, type: number, value: Buffer) {

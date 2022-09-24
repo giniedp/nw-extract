@@ -1,6 +1,6 @@
 {
   "name": "nw-extract",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "",
   "scripts": {
     "build": "tsc",
@@ -12,14 +12,14 @@
   "keywords": [],
   "author": "Alexander Gräfenstein",
   "license": "MIT",
-  
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "engines": {
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
   },
   "bin": {
-    "nw-extract": "./dist/extract.js"
+    "nw-extract": "./dist/extract.js",
+    "nw-convert": "./dist/convert.js"
   },
   "files": [
     "dist",
@@ -30,27 +30,33 @@
     "win32"
   ],
   "dependencies": {
-    "jsdom": "^19.0.0",
-    "tmp": "^0.2.1",
-    "xmldom": "^0.6.0",
-    "cli-progress": "^3.10.0",
-    "commander": "^8.3.0",
-    "fast-glob": "^3.2.10",
+    "cli-progress": "^3.11.2",
+    "commander": "^9.4.0",
+    "concat-stream": "^2.0.0",
+    "fast-glob": "^3.2.12",
     "ffi-napi": "^4.0.3",
+    "jsdom": "^19.0.0",
     "lodash": "^4.17.21",
-    "papaparse": "^5.3.1",
-    "yauzl": "https://github.com/Kattoor/yauzl.git",
-    "tslib": "^2.4.0"
+    "papaparse": "^5.3.2",
+    "tmp": "^0.2.1",
+    "tslib": "^2.4.0",
+    "xmldom": "^0.6.0",
+    "yauzl": "https://github.com/Kattoor/yauzl.git"
   },
   "devDependencies": {
-    "@types/tmp": "^0.2.3",
-    "@types/cli-progress": "^3.9.2",
+    "@types/cli-progress": "^3.11.0",
+    "@types/concat-stream": "^2.0.0",
+    "@types/debug": "^4.1.7",
     "@types/jsdom": "^16.2.14",
-    "@types/lodash": "^4.14.178",
-    "@types/papaparse": "^5.3.1",
+    "@types/lodash": "^4.14.185",
+    "@types/micromatch": "^4.0.2",
+    "@types/papaparse": "^5.3.5",
+    "@types/tmp": "^0.2.3",
     "@types/xmldom": "^0.1.31",
-    "@types/yauzl": "^2.9.2",
-    "ts-node": "^10.4.0",
+    "@types/yauzl": "^2.10.0",
+    "debug": "^4.3.4",
+    "micromatch": "^4.0.5",
+    "ts-node": "^10.9.1",
     "typescript": "^4.5.4"
   }
 }
