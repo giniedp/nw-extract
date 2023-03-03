@@ -5,4 +5,4 @@ tmp
 dist
 yarn-error.log
 oo2core_8_win64.dll
-texconf.exe
+texconv.exe
