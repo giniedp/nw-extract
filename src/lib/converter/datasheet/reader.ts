@@ -1,4 +1,4 @@
-import { promises as fs } from "fs";
+import * as fs from 'fs'
 
 const OFFSET_NUM_COLUMNS = 0x44;
 const OFFSET_NUM_ROWS = 0x48;
@@ -16,6 +16,11 @@ export type DatasheetRow = Array<string | number | boolean>
 export interface Datasheet {
   header: HeaderCell[]
   rows: DatasheetRow[]
+}
+
+export async function readDatasheet(file: string): Promise<Datasheet> {
+  const buffer = await fs.promises.readFile(file)
+  return parseDatasheet(buffer)
 }
 
 export async function parseDatasheet(data: Buffer): Promise<Datasheet> {

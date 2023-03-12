@@ -1,49 +1,48 @@
 #!/usr/bin/env node
 
-import { MultiBar, Presets } from 'cli-progress'
 import { program } from 'commander'
 import * as path from 'path'
-import { AssetFilter, convert, createConverter, createFilter } from "./lib"
-import { debug } from './lib/debug'
+import { convert } from './lib/actions/convert'
+import { logger } from './lib/utils'
 
+function collect(value: string, previous: string[]) {
+  return previous.concat(value.split(','))
+}
 interface Options {
   update: boolean
   output: string
-  filter: string
+  convert: string[]
 }
 
 program
-  .argument('<input-dir>', 'Input dir or file')
-  .option('-o,--output <path>', 'Output folder')
-  .option('-u,--update', 'Skips cache mechanisms for subsequential runs.', false)
-  .option('-f,--filter <type>', 'Asset filter and conversion flags.')
-  .addHelpText('afterAll', `
+  .argument('<input-dir>', 'Location of extracted New World folder')
+  .option('-o,--output <path>', 'Output forlder for converted files')
+  .option('-u,--update', 'Overrides previously converted files', false)
+  .option('-c,--convert <convert>', 'Conversion directives', collect, [])
+  .addHelpText(
+    'afterAll',
+    `
 Example:
-  nw-convert \"path/to/dir\" -f "datasheet:json"
-`)
+  nw-convert ./nw-extract-out -o ./nw-convert-out -c "json:**/*.datasheet"
+  nw-convert ./nw-extract-out -o ./nw-convert-out -c "json:**/*.loc.xml"
+  nw-convert ./nw-extract-out -o ./nw-convert-out -c "png:**/*.dds"
+`,
+  )
   .action(async (inputDir) => {
     const opts: Options = program.opts()
-    const bar = new MultiBar({
-      stopOnComplete: true,
-      clearOnComplete: false,
-      hideCursor: true,
-      format: '{bar} {percentage}% | {value}/{total} | {filename}'
-    }, Presets.shades_grey)
-    const b1 = bar.create(0, 0)
-    const filter = opts.filter?.split(/[,.| ]/) as AssetFilter[]
-
+    logger.verbose(true)
+    logger.debug('convert', inputDir, opts)
     await convert({
       update: !!opts.update,
       inputDir: inputDir,
       outputDir: path.join(process.cwd(), opts.output || inputDir),
-      filter: createFilter(filter),
-      converterFactory: createConverter(filter),
-      onProgress: (p) => {
-        if (!debug.enabled) {
-          b1.setTotal(p.mainTotal)
-          b1.update(p.mainDone, { filename: p.mainInfo })
+      conversions: opts.convert.map((it) => {
+        const [format, pattern] = it.split(':')
+        return {
+          format,
+          pattern: pattern.split('+'),
         }
-      }
+      }),
     })
-    bar.stop()
-  }).parse(process.argv)
+  })
+  .parse(process.argv)

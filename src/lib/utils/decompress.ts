@@ -1,8 +1,8 @@
 import concat from 'concat-stream'
+import { debug } from './debug'
 import { promises as fs } from 'fs'
 import { Entry, open, ZipFile } from 'yauzl'
-import { debug } from './debug'
-import { handleError } from './error'
+import { logger } from './logger'
 
 export async function decompress({
   zipFile,
@@ -30,7 +30,7 @@ export async function decompress({
         oodleEntries.push(entry)
         break
       default:
-        handleError(`unsupported compression method ${entry.compressionMethod} ${entry.fileName}`)
+        logger.error(`unsupported compression method ${entry.compressionMethod} ${entry.fileName}`)
         handler(entry, null)
         break
     }
@@ -108,9 +108,9 @@ export async function decompressOodle({
         3,
       )
 
-      await handler(entry, uncompressedData).catch(handleError)
+      await handler(entry, uncompressedData).catch((err) => logger.error(err))
     } catch (err) {
-      handleError(err)
+      logger.error(err)
     }
   }
   await fileHandle.close()
@@ -146,7 +146,7 @@ export async function decompressZip({
             const buffer = await handleDeflate(entry, zip)
             await handler(entry, buffer)
           } catch (err) {
-            handleError(handleError)
+            logger.error(err)
           }
         }
         zip.readEntry()

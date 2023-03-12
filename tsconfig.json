@@ -6,9 +6,10 @@
     "moduleResolution": "node",
     "importHelpers": true,
     "module": "CommonJS",
-    "target": "ES5",
+    "target": "ESNext",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "declaration": true
+    "declaration": true,
+    "skipLibCheck": true
   }
 }

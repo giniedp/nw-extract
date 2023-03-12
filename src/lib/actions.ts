@@ -1,13 +1,11 @@
-import { promises as fs } from 'fs'
+import * as fs from 'fs'
 import * as path from 'path'
 import { listFiles, listFilesInZip, listPakFiles } from './listFiles'
-import { decompress } from './decompress'
-import { oodleLibrary } from './oodle'
-import { Entry } from 'yauzl'
-import { pathIsFile } from './copy'
-import { debug } from './debug'
+import { logger } from './utils'
+import { oodleLibrary } from './utils/oodle'
+import { decompress } from './utils/decompress'
 
-export type FilterFn = (entry: Entry) => boolean
+export type FilterFn = (entry: string) => boolean
 export type ConverterFactory = (file: string, data: Buffer) => Converter
 export type Converter = { format?: string; data: Buffer | ConverterFn }
 export type ConverterFn = () => Promise<Buffer>
@@ -18,7 +16,6 @@ export interface ExtractOptions {
   outputDir: string
   libDir?: string
   filter?: FilterFn
-  converterFactory?: ConverterFactory
   onProgress?: (data: ExtractProgress) => void
 }
 
@@ -36,11 +33,10 @@ export async function extract({
   outputDir,
   libDir,
   filter,
-  converterFactory,
   onProgress,
   update,
 }: ExtractOptions) {
-  debug(`extract ${inputDir} -> ${outputDir}`)
+  logger.activity('extract', ` ${inputDir} -> ${outputDir}`)
   const pakFiles = await listPakFiles(inputDir)
   const groups = pakFiles.map((file) => {
     return {
@@ -57,11 +53,6 @@ export async function extract({
     subDone: 0,
     subInfo: '',
   }
-  converterFactory =
-    converterFactory ||
-    ((entry, buffer) => ({
-      data: buffer,
-    }))
 
   for (const group of groups) {
     progress.mainInfo = group.file
@@ -86,20 +77,14 @@ export async function extract({
         progress.subDone += 1
         onProgress?.(progress)
 
-        const converter = converterFactory(entry.fileName, data)
-        const ext = path.extname(entry.fileName)
         const filePath = path.join(outputDir, entry.fileName)
-
         const outDir = path.dirname(filePath)
-        const outFile = path.basename(filePath, ext) + (converter.format ? `.${converter.format}` : ext)
+        const outFile = path.basename(filePath)
         const outPath = path.join(outDir, outFile)
-        const outExists = await pathIsFile(outPath)
+        const outExists = fs.existsSync(outPath)
         if (update || !outExists) {
-          const outData = typeof converter.data === 'function' ? await converter.data() : converter.data
-          if (outData) {
-            await fs.mkdir(outDir, { recursive: true })
-            await fs.writeFile(outPath, outData)
-          }
+          await fs.promises.mkdir(outDir, { recursive: true })
+          await fs.promises.writeFile(outPath, data)
         }
       },
     })
@@ -116,7 +101,7 @@ export interface ConvertOptions {
 }
 
 export async function convert({ inputDir, outputDir, filter, converterFactory, onProgress, update }: ConvertOptions) {
-  debug(`convert ${inputDir} -> ${outputDir}`)
+  logger.activity(`convert ${inputDir} -> ${outputDir}`)
   
   const files = await listFiles(inputDir)
   
@@ -142,7 +127,7 @@ export async function convert({ inputDir, outputDir, filter, converterFactory, o
     progress.subInfo = 'resolve entries'
     onProgress?.(progress)
 
-    const data = await fs.readFile(file)
+    const data = await fs.promises.readFile(file)
     const converter = converterFactory(file, data)
     const ext = path.extname(file)
     const filePath = path.join(outputDir, path.relative(inputDir, file))
@@ -150,11 +135,11 @@ export async function convert({ inputDir, outputDir, filter, converterFactory, o
     const outDir = path.dirname(filePath)
     const outFile = path.basename(filePath, ext) + (converter.format ? `.${converter.format}` : ext)
     const outPath = path.join(outDir, outFile)
-    const outExists = await pathIsFile(outPath)
+    const outExists = fs.existsSync(outPath)
     if (update || !outExists) {
       const outData = typeof converter.data === 'function' ? await converter.data() : converter.data
-      await fs.mkdir(outDir, { recursive: true })
-      await fs.writeFile(outPath, outData)
+      await fs.promises.mkdir(outDir, { recursive: true })
+      await fs.promises.writeFile(outPath, outData)
     }
   }
 }

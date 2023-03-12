@@ -1,5 +1,25 @@
+import * as path from 'path'
+import * as fs from 'fs'
+import { replaceExtname, writeFile } from '../../utils'
 import { unparse } from 'papaparse'
-import { Datasheet } from './readDatasheet'
+import { Datasheet, readDatasheet } from './reader'
+
+export interface ConvertDatasheetOptions {
+  file: string
+  outDir?: string
+  format: string
+  unlink?: boolean
+}
+
+export async function convertDatasheetFile({ file, outDir, format, unlink }: ConvertDatasheetOptions) {
+  const datasheet = await readDatasheet(file)
+  const outData = convertDatasheet(datasheet, format)
+  const outFile = path.join(outDir || path.dirname(file), replaceExtname(path.basename(file), `.${format}`))
+  await writeFile(outFile, outData, { encoding: 'utf-8', createDir: true })
+  if (unlink) {
+    fs.unlinkSync(file)
+  }
+}
 
 export function convertDatasheet(sheet: Datasheet, format: string) {
   switch (format) {
@@ -8,7 +28,7 @@ export function convertDatasheet(sheet: Datasheet, format: string) {
     case 'json':
       return datasheetToJson(sheet)
   }
-  return ''
+  throw new Error(`Unsupported format: ${format}`)
 }
 
 export function datasheetToCsv(sheet: Datasheet) {

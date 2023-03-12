@@ -1,5 +1,25 @@
-import { unparse } from "papaparse";
+import * as path from 'path'
+import * as fs from 'fs'
+import { unparse } from "papaparse"
 import { JSDOM } from 'jsdom'
+import { replaceExtname, writeFile } from '../../utils'
+
+export interface ConvertLocaleOptions {
+  file: string
+  outDir?: string
+  format: string
+  unlink?: boolean
+}
+
+export async function convertLocaleFile({ file, format, outDir, unlink }: ConvertLocaleOptions) {
+  const buffer = await fs.promises.readFile(file)
+  const outData = await convertLocale(buffer, format)
+  const outFile = path.join(outDir || path.dirname(file), replaceExtname(path.basename(file), `.${format}`))
+  await writeFile(outFile, outData, { encoding: 'utf-8', createDir: true })
+  if (unlink) {
+    fs.unlinkSync(file)
+  }
+}
 
 export async function convertLocale(xmlData: Buffer, format: string) {
   switch (format) {
@@ -10,7 +30,7 @@ export async function convertLocale(xmlData: Buffer, format: string) {
     case "json":
       return localeToJson(xmlData);
   }
-  return ''
+  throw new Error(`Unsupported format: ${format}`)
 }
 
 function localeToJson(data: Buffer) {

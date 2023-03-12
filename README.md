@@ -18,6 +18,7 @@ Install globally
 npm install nw-extract
 ```
 
+### Extract files
 Then to extract data from game intall dir
 
 ```sh
@@ -27,49 +28,41 @@ nw-extract "C:\Program Files (x86)\Steam\steamapps\common\New World"
 The tool accept sfollowing arguments and options
 ```
 Arguments:
-  input-dir              New World game folder
+  input-dir             New World game folder
 
 Options:
-  -o,--output            Output folder (default: "./nw-extract-output")
-  -u,--update            force update (default: false)
-  -f,--filter <type>     type of assets to extract
-  --lib <path>           path to directory where oo2core_8_win64.dll is located (default: "")
-  -h, --help             display help for command
+  -o,--output <path>    Output folder (default: "./nw-extract-out")
+  -f,--filter <filter>  Filter glob pattern (default: [])
+  --lib <path>          Directory where oo2core_8_win64.dll is located
+  -h, --help            display help for command
 
-Examples:
+Example:
   nw-extract "C:\Program Files (x86)\Steam\steamapps\common\New World"
-  nw-extract "C:\Program Files (x86)\Steam\steamapps\common\New World" -f "datasheet:json,icon:png"
-  nw-extract "C:\Program Files (x86)\Steam\steamapps\common\New World" -f "datasheet:json,icon:png,image:png,locale"
+  nw-extract "C:\Program Files (x86)\Steam\steamapps\common\New World" -f **/*.datasheet
+  nw-extract "C:\Program Files (x86)\Steam\steamapps\common\New World" -f **/*.datasheet,**/*.loc.xml
+  nw-extract "C:\Program Files (x86)\Steam\steamapps\common\New World" -f **/*.datasheet -f **/*.loc.xml
 ```
 
-## Installation (dependency)
-
-Add dependency to your project
+### Convert Files
+To convert extracted files to another format
 
 ```sh
-npm install nw-extract -D
+nw-convert "./nw-extract-out" -o OUT_DIR -c CONVERSION
 ```
 
-ES6 import
-
-```js
-import { extract, createFilter, createConverter } from 'nw-extract'
+The tool accepts following arguments and options
 ```
+Arguments:
+  input-dir               Location of extracted New World folder
 
-Execute aus you need
+Options:
+  -o,--output <path>      Output forlder for converted files (default: "./nw-convert-out")
+  -u,--update             Overrides previously converted files (default: false)
+  -c,--convert <convert>  Conversion directives (default: [])
+  -h, --help              display help for command
 
-```js
-extract({
-  update: false,
-  inputDir: "C:\\Program Files (x86)\\Steam\\steamapps\\common\\New World",
-  outputDir: path.join(process.cwd(), './output'),
-  libDir: process.cwd(),
-  filter: createFilter("datasheet"),
-  converterFactory: createConverter("datasheet:json"),
-  onProgress: (p) => {
-    // track progress
-  }
-}).then(() => {
-  // done
-})
+Example:
+  nw-convert ./nw-extract-out -o ./nw-convert-out -c "json:**/*.datasheet"
+  nw-convert ./nw-extract-out -o ./nw-convert-out -c "json:**/*.loc.xml"
+  nw-convert ./nw-extract-out -o ./nw-convert-out -c "png:**/*.dds"
 ```
