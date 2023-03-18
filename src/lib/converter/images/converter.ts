@@ -5,15 +5,17 @@ import { copyFile, replaceExtname } from '../../utils'
 import { convertDdsFile, copyDdsFile } from '../dds/converter'
 
 export interface ConvertTextureOptions {
+  bin?: string
+  exe?: string
   file: string
   outDir: string
   format: string
 }
 
-export async function convertImageFile({ file, outDir, format }: ConvertTextureOptions): Promise<void> {
+export async function convertImageFile({ file, outDir, format, bin, exe }: ConvertTextureOptions): Promise<void> {
   const extname = path.extname(file).toLowerCase()
   if (extname.endsWith('.dds')) {
-    return convertDds({ file, outDir, format })
+    return convertDds({ file, outDir, format, bin, exe })
   }
 
   if (extname.endsWith(`.${format}`.toLowerCase())) {
@@ -24,6 +26,8 @@ export async function convertImageFile({ file, outDir, format }: ConvertTextureO
   }
 
   return texconv({
+    bin,
+    exe,
     input: file,
     fileType: format,
     overwrite: true,
@@ -31,7 +35,7 @@ export async function convertImageFile({ file, outDir, format }: ConvertTextureO
   })
 }
 
-async function convertDds({ file, outDir, format }: ConvertTextureOptions): Promise<void> {
+async function convertDds({ file, outDir, format, bin, exe }: ConvertTextureOptions): Promise<void> {
   const files = await copyDdsFile({
     input: file,
     output: path.join(outDir, path.basename(file))
@@ -44,7 +48,9 @@ async function convertDds({ file, outDir, format }: ConvertTextureOptions): Prom
       isNormal: isDDNA && !isA,
       file: tmpFile,
       outDir: outDir,
-      format: format
+      format: format,
+      bin,
+      exe
     })
   }
   const dirA = path.resolve(process.cwd(), path.dirname(file))

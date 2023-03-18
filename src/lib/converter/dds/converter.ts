@@ -5,6 +5,8 @@ import * as path from 'path'
 import { texconv, TexconvArgs } from '../../tools/texconv'
 
 export interface DdsToPngOptions {
+  bin?: string
+  exe?: string
   isNormal: boolean
   file: string
   format: string
@@ -12,9 +14,11 @@ export interface DdsToPngOptions {
   size?: number
 }
 
-export async function convertDdsFile({ isNormal, file, format, outDir, size }: DdsToPngOptions) {
+export async function convertDdsFile({ isNormal, file, format, outDir, size, bin, exe }: DdsToPngOptions) {
   const pngFile = replaceExtname(file, `.${format}`)
   const options: TexconvArgs = {
+    bin,
+    exe,
     input: file,
     overwrite: true,
     fileType: format,

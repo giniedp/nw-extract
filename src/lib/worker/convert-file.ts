@@ -8,13 +8,14 @@ import { isDatasheet, isImageFile, isLocale } from '../listFiles'
 import { replaceExtname } from '../utils/file-utils'
 
 export interface ConvertFileOptions {
+  bin?: string
   file: string
   outDir: string
   update?: boolean
   format: string
 }
 
-export async function convertFile({ file, outDir, update, format }: ConvertFileOptions) {
+export async function convertFile({ file, bin, outDir, update, format }: ConvertFileOptions) {
   const outFile = path.join(outDir, replaceExtname(path.basename(file), `.${format}`))
   if (fs.existsSync(outFile) && !update) {
     logger.info('skipped', file)
@@ -32,7 +33,7 @@ export async function convertFile({ file, outDir, update, format }: ConvertFileO
   }
   if (isImageFile(file)) {
     return convertImageFile({
-      file, outDir, format
+      bin, file, outDir, format
     })
   }
 }

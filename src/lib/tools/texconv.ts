@@ -1,7 +1,9 @@
-import { logger, spawn } from "../utils"
+import * as path from 'path'
+import { logger, spawn } from '../utils'
 
 export interface TexconvArgs {
   exe?: string
+  bin?: string
   input: string
   // Output directory.
   output?: string
@@ -19,6 +21,7 @@ export interface TexconvArgs {
 
 export async function texconv({
   exe,
+  bin,
   input,
   output,
   fileType,
@@ -30,7 +33,8 @@ export async function texconv({
   reconstructZ,
 }: TexconvArgs) {
   // https://github.com/Microsoft/DirectXTex/wiki/Texconv
-  const tool = exe || 'texconv.exe'
+  exe = exe || 'texconv.exe'
+  const tool = bin ? path.join(bin, exe) : exe
   const args = []
   if (fileType) {
     args.push(`-ft`, fileType)

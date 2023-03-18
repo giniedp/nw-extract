@@ -30,7 +30,9 @@ async function runThreaded<K extends TaskName>({ threads, taskName, tasks }: Run
   }
   let count = 0
 
-  const bar = new SingleBar({}, Presets.shades_classic)
+  const bar = new SingleBar({
+    format: '{bar} | {percentage}% | {duration_formatted} | {value}/{total}',
+  }, Presets.shades_classic)
   const runner = workerpool.pool(path.join(__dirname, 'worker.js'), {
     maxWorkers: threads,
     workerType: 'thread',

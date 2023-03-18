@@ -12,12 +12,16 @@ interface Options {
   update: boolean
   output: string
   convert: string[]
+  bin: string
+  threads: number
 }
 
 program
   .argument('<input-dir>', 'Location of extracted New World folder')
   .option('-o,--output <path>', 'Output forlder for converted files')
   .option('-u,--update', 'Overrides previously converted files', false)
+  .option('-b,--bin <path>', 'Binaries directory')
+  .option('-t,--threads <threads>', 'Number of threads')
   .option('-c,--convert <convert>', 'Conversion directives', collect, [])
   .addHelpText(
     'afterAll',
@@ -33,6 +37,8 @@ Example:
     logger.verbose(true)
     logger.debug('convert', inputDir, opts)
     await convert({
+      bin: opts.bin,
+      threads: opts.threads,
       update: !!opts.update,
       inputDir: inputDir,
       outputDir: path.join(process.cwd(), opts.output || inputDir),

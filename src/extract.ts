@@ -38,7 +38,7 @@ Example:
         stopOnComplete: true,
         clearOnComplete: false,
         hideCursor: true,
-        format: '{bar} {percentage}% | {value}/{total} | {filename}',
+        format: '{bar} | {percentage}% | {duration_formatted} | {value}/{total} | {filename}',
       },
       Presets.shades_grey,
     )
